@@ -47,7 +47,6 @@
     padding: 10px;
     border-radius: 5px;
   }
-
   .options-container {
     display: flex;
     flex-wrap: wrap;
