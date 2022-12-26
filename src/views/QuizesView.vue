@@ -2,6 +2,7 @@
   import {ref, watch} from 'vue'
   import q from '../data/quizes.json'
   import Card from '../components/Card.vue'
+  import gsap from "gsap"
 
   const quizes = ref(q)
   const search = ref("")
@@ -9,6 +10,23 @@
   watch(search, () => {
     quizes.value = q.filter(quiz => quiz.name.toLocaleLowerCase().includes(search.value.toLowerCase()))
   })
+
+  const beforeEnter = (el) => {
+    // console.log("BEFORE ENTER")
+    el.style.opacity = 0
+    el.style.transform = "translateY(-80px)"
+  }
+  const enter = (el) => {
+    gsap.to(el, {
+      y: 0,
+      opacity: 1,
+      duration: 0.4,
+      delay: el.dataset.index * 0.2
+    })
+  }
+  const afterEnter = (el) => {
+    // console.log("AFTER ENTER")
+  }
 
 </script>
 <template>
@@ -18,14 +36,19 @@
       <input v-model.trim="search" type="text" placeholder="Search...">
     </header>
     <div class="options-container">
-      <Card v-for="quiz in quizes" :key="quiz.id" :quiz="quiz" />
-      <!-- <div v-for="quiz in quizes" :key="quiz.id" class="card">
-        <img :src="quiz.img" alt="">
-        <div class="card-text">
-          <h2>{{ quiz.name }}</h2>
-          <p>{{ quiz.questions.length }} questions</p>
-        </div>
-      </div> -->
+      <TransitionGroup 
+        appear
+        @before-enter="beforeEnter"
+        @enter="enter"
+        @after-enter="afterEnter"
+      >
+        <Card 
+          v-for="(quiz, index) in quizes" 
+          :key="quiz.id" 
+          :quiz="quiz"
+          :data-index="index"
+        />
+      </TransitionGroup>
     </div>
   </div>
 </template>
@@ -52,5 +75,4 @@
     flex-wrap: wrap;
     margin-top: 40px;
   }
-
 </style>
